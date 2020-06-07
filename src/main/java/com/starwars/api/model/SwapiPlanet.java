@@ -9,9 +9,9 @@ public class SwapiPlanet {
     
     private List<String> films;
 
-    public SwapiPlanet(){
+    public SwapiPlanet() {
 
-    };
+    }
     
     public SwapiPlanet(List<String> films) {
         this.films = films;
@@ -19,5 +19,9 @@ public class SwapiPlanet {
 
     public List<String> getFilms() {
         return this.films;
+    }
+    
+    public void setFilmes(List<String> films) {
+    	this.films = films;
     }
 }
