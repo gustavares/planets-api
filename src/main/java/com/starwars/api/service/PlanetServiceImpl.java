@@ -66,14 +66,18 @@ public class PlanetServiceImpl implements PlanetService {
             .getForEntity(SWAPI_URL_PLANETS_SEARCH + planet.getName(), String.class);
 
         ObjectMapper mapper = new ObjectMapper();
-        SwapiPlanet firstPlanetFound;
-        try {
-            SwapiResult result = mapper.readValue(swapiResponse.getBody(), SwapiResult.class);
-            firstPlanetFound = result.getResults().get(0);
+        SwapiPlanet firstPlanetFound = null;
 
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            firstPlanetFound = null;
+        if (swapiResponse != null) {
+	        try {
+	            SwapiResult result = mapper.readValue(swapiResponse.getBody(), SwapiResult.class);
+	            
+	            if (result.getPlanetList().size() > 0) {
+	            	firstPlanetFound = result.getPlanetList().get(0);
+	            }
+	        } catch (JsonProcessingException e) {
+	            e.printStackTrace();
+	        }
         }
 
         return firstPlanetFound;

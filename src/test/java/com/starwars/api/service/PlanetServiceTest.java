@@ -1,7 +1,5 @@
 package com.starwars.api.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.mockito.Mockito.lenient;
 
 import java.util.ArrayList;
@@ -12,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,9 +18,12 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import com.starwars.api.model.Planet;
+import com.starwars.api.model.SwapiPlanet;
+import com.starwars.api.model.SwapiResult;
 import com.starwars.api.repository.PlanetRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,5 +84,16 @@ public class PlanetServiceTest {
 		
 		Assertions.assertNotNull(planetsFound);
 		Assertions.assertIterableEquals(planetsFound, planetList);
+	}
+	
+	@Test
+	public void savePlanet_shouldReturnNullIfPlanetDoesntExist() {
+		lenient().when(restTemplate.getForEntity(Mockito.anyString(), ArgumentMatchers.eq(String.class))).thenReturn(null);
+		
+		Planet planet = new Planet("planetThatDoesNotExist", "hot", "vulcanoes");
+		
+		Planet storedPlanet = planetService.savePlanet(planet);
+		
+		Assertions.assertNull(storedPlanet);
 	}
 }
