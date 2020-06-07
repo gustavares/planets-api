@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.starwars.api.model.Planet;
 import com.starwars.api.model.SwapiPlanet;
 import com.starwars.api.repository.PlanetRepository;
-import com.starwars.swapiClient.SwapiPlanetService;
 
 @ExtendWith(MockitoExtension.class)
 public class PlanetServiceTest {
@@ -117,5 +116,25 @@ public class PlanetServiceTest {
 		
 		Assertions.assertEquals(expectedPlanet, storedPlanet);
 		
+	}
+	
+	@Test
+	public void deletePlanet_shouldReturnNull() {
+		lenient().when(planetRepository.deleteByIdReturnDeletCount(Mockito.anyString())).thenReturn(0);
+		
+		String deletedId = planetService.deletePlanet("1");
+		
+		Assertions.assertNull(deletedId);
+	}
+	
+	@Test
+	public void deletePlanet_shouldReturnDeletedId() {
+		String idToDelete = "1";
+		
+		lenient().when(planetRepository.deleteByIdReturnDeletCount(Mockito.anyString())).thenReturn(1);
+		
+		String deletedId = planetService.deletePlanet(idToDelete);
+		
+		Assertions.assertEquals(idToDelete, deletedId);
 	}
 }
