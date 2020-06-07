@@ -10,4 +10,5 @@ public interface PlanetService {
     List<Planet> findByName(String name);
     Planet findById(String id);
     Planet savePlanet(Planet planet);
+    String deletePlanet(String id);
 }

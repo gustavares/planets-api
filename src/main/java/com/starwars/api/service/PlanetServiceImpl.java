@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.starwars.api.model.Planet;
 import com.starwars.api.model.SwapiPlanet;
 import com.starwars.api.repository.PlanetRepository;
-import com.starwars.swapiClient.SwapiPlanetService;
 
 @Service
 public class PlanetServiceImpl implements PlanetService {
@@ -16,7 +15,8 @@ public class PlanetServiceImpl implements PlanetService {
     @Autowired
     private PlanetRepository planetRepository;
     
-    @Autowired SwapiPlanetService swapiService;
+    @Autowired 
+    SwapiPlanetService swapiService;
 
     @Override
     public List<Planet> findAll() {
@@ -44,4 +44,18 @@ public class PlanetServiceImpl implements PlanetService {
         
         return planetRepository.save(planet);
     }
+
+	@Override
+	public String deletePlanet(String id) {
+		int deleteCount = 0;
+		
+		try {
+			deleteCount = planetRepository.deleteByIdReturnDeletCount(id);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return deleteCount > 0 ? id : null; 
+	}
 }
