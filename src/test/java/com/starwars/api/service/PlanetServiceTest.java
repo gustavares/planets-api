@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -18,19 +17,17 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import com.starwars.api.model.Planet;
 import com.starwars.api.model.SwapiPlanet;
-import com.starwars.api.model.SwapiResult;
 import com.starwars.api.repository.PlanetRepository;
+import com.starwars.swapiClient.SwapiPlanetService;
 
 @ExtendWith(MockitoExtension.class)
 public class PlanetServiceTest {
 
 	@Mock
-	private RestTemplate restTemplate;
+	private SwapiPlanetService swapiService;
 	
 	@Mock
 	private PlanetRepository planetRepository;
@@ -88,12 +85,37 @@ public class PlanetServiceTest {
 	
 	@Test
 	public void savePlanet_shouldReturnNullIfPlanetDoesntExist() {
-		lenient().when(restTemplate.getForEntity(Mockito.anyString(), ArgumentMatchers.eq(String.class))).thenReturn(null);
+		lenient().when(swapiService.getPlanetFromSwapi(Mockito.any(Planet.class))).thenReturn(null);
 		
 		Planet planet = new Planet("planetThatDoesNotExist", "hot", "vulcanoes");
 		
 		Planet storedPlanet = planetService.savePlanet(planet);
 		
 		Assertions.assertNull(storedPlanet);
+	}
+	
+	@Test 
+	public void savePlanet_shouldReturnTheSavedPlanetWithId() {
+		Planet expectedPlanet = new Planet("123", "Kamino", "hot", "jungle", 2);
+			
+		lenient().when(swapiService.getPlanetFromSwapi(Mockito.any(Planet.class))).then(new Answer<SwapiPlanet>() {
+
+			@Override
+			public SwapiPlanet answer(InvocationOnMock invocation) throws Throwable {
+				List<String> movieList = new ArrayList<String>();
+				movieList.add("movie1");
+				movieList.add("movie2");
+				
+				return new SwapiPlanet(movieList);
+			}
+			
+		});
+		lenient().when(planetRepository.save(Mockito.any(Planet.class))).thenReturn(expectedPlanet);
+		
+		Planet planetToBeSaved = new Planet("Kamino", "hot", "jungle");
+		Planet storedPlanet = planetService.savePlanet(planetToBeSaved);
+		
+		Assertions.assertEquals(expectedPlanet, storedPlanet);
+		
 	}
 }
